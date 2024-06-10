@@ -15,6 +15,7 @@ const printFileLineByLine = async (filePath) => {
   });
 
   let outputData = '';
+  const binaryLines = [];
 
   for await (const line of rl) {
     const trimmedLine = line.trim();
@@ -40,10 +41,10 @@ const printFileLineByLine = async (filePath) => {
       binaryLine = changeCCommandTo16BitBinary(trimmedLine);
     }
 
-    outputData += binaryLine + '\n';
+    binaryLines.push(binaryLine);
   }
 
-  return outputData;
+  return binaryLines.join('\n');
 };
 
 const readAndProcessFiles = async (inputFilePath, outputFilePath) => {

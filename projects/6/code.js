@@ -10,7 +10,7 @@ const hasCompM = (comp) => {
 };
 
 const getDestBinary = (destString) => {
-  return DEST_TABLE.get(destString);
+  return DEST_TABLE.get(destString ?? 'null');
 };
 
 const getCompBinary = (compString) => {

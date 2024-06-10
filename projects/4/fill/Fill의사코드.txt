@@ -1,0 +1,53 @@
+// 키보드에 입력이 있을때 화면 전체의 픽셀을 채운다. -1값으로 모두 채우는게 핵심일 듯
+// 키보드에 입력이 없으면 화면 전체를 0값으로 채운다.
+// 인피니트 루프를 작성하는게 필요함
+
+// 키보드 레지스터를 가지고 온다.
+// 키보드의 값이 0이면 전체를 0으로 채우고
+// 키보드의 값이 0이 아니면 전체를 -1로 채운다
+// 이 로직이 인피티니 루프로 돌고 있어야 함.
+
+
+// 스크린은 512개 열 * 256개 행의 흑백 픽셀로 구성됨
+// 행은 32개의 연속된 16비트 단어
+// addr = addr + 32 해야 다음행으로 이동하는데
+// 그이유는 16비트 묶음 32개를 뛰어넘어야 다음행으로 이동하기 때문
+// row번째 행, col번째 열은 다음과 같이 맵핑됨
+// RAM[SCREEN + row*32 + col/16]
+
+
+// KBD값이 0이 아니면 모든 행과열을 돌면서 값을 -1로 세팅한다.
+// 먼저 행의 모든 값을 -1로 처리하고
+// 그다음 열을 바ㄲ
+
+addr = SCRREN
+n = 8192
+iOne = 1
+iTwo = 1
+
+LOOP1:
+    if (KBD === 0) goto LOOP2
+    if (iOne > n) goto LOOP1
+   iOne초기화
+   addr초기화
+    @LOOPMAKEBLACK
+    0;JMP
+LOOP2:
+    if (KBD !== 0) goto LOOP1
+    if (iTwo > n) goto LOOP2
+   iTwo초기화
+  addr초기화
+    @LOOPMAKEWHITE
+    0;JMP
+LOOPMAKEBLACK:
+   if (iOne > n) goto LOOP1
+   RAM[addr] = -1
+   addr = addr + 1
+   iOne = iOne + 1
+   goto LOOPMAKEBLACK
+LOOPMAKEWHITE:
+   if (i > n) goto LOOP2
+   RAM[addr] = 0
+   addr = addr + 1
+   iOne = iOne + 1
+   goto LOOPMAKEWHITE

@@ -4,6 +4,44 @@ const get16BitBinaryFromNumber = (number) => {
   return number.toString(2).padStart(16, '0');
 };
 
+const hasEqualSign = (string) => {
+  if (!string) {
+    return false;
+  }
+
+  return string.includes('=');
+};
+
+const hasSemiColon = (string) => {
+  if (!string) {
+    return false;
+  }
+
+  return string.includes(';');
+};
+
+const getDest = (cCommand) => {
+  return hasEqualSign(cCommand) ? cCommand.split('=')[0] : null;
+};
+
+const getJump = (cCommand) => {
+  return hasSemiColon(cCommand) ? cCommand.split(';')[1] : null;
+};
+
+const getComp = (cCommand) => {
+  if (hasEqualSign(cCommand) && hasSemiColon(cCommand)) {
+    return splitCompAndJump(splitDestAndRest(cCommand)['compAndJump'])['comp'];
+  }
+
+  if (hasEqualSign(cCommand) && !hasSemiColon(cCommand)) {
+    return splitDestAndRest(cCommand)['compAndJump'];
+  }
+
+  if (!hasEqualSign(cCommand) && hasSemiColon(cCommand)) {
+    return splitCompAndJump(cCommand)['comp'];
+  }
+};
+
 const splitDestAndRest = (cCommand) => {
   const [dest, compAndJump] = cCommand.split('=');
 
@@ -27,12 +65,17 @@ const changeCCommandTo16BitBinary = (cCommand) => {
   console.log('cCommand', cCommand);
   const C_COMMAND_START = '111';
 
-  const { dest, compAndJump } = splitDestAndRest(cCommand);
-  const { comp, jump } = splitCompAndJump(compAndJump);
+  const dest = getDest(cCommand);
+  const comp = getComp(cCommand);
+  const jump = getJump(cCommand);
 
   const destBinary = getDestBinary(dest);
   const compBinary = getCompBinary(comp);
   const jumpBinary = getJumpBinary(jump);
+
+  console.log('dest', dest);
+  console.log('comp', comp);
+  console.log('jump', jump);
 
   const sixTeenbitBinary =
     C_COMMAND_START + compBinary + destBinary + jumpBinary;
