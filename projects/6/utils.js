@@ -2,12 +2,12 @@ const fs = require('fs');
 const readline = require('readline');
 
 const {
-  changeACommandTo16BitBinary,
-  changeCCommandTo16BitBinary,
+  changeACommandTo16BitsBinary,
+  changeCCommandTo16BitsBinary,
 } = require('./parser');
 const { SYMBOL_TABLE } = require('./constant');
 
-const updateLabelLineByLine = async (filePath) => {
+const updateLabelToSymbolTableLineByLine = async (filePath) => {
   const fileStream = fs.createReadStream(filePath);
   const rl = readline.createInterface({
     input: fileStream,
@@ -21,7 +21,6 @@ const updateLabelLineByLine = async (filePath) => {
 
     const isComment = trimmedLine.startsWith('//');
     const isWhiteSpace = trimmedLine.length === 0;
-    const isACommand = trimmedLine.startsWith('@');
     const isLabel = trimmedLine.startsWith('(');
 
     if (isComment) {
@@ -34,17 +33,11 @@ const updateLabelLineByLine = async (filePath) => {
 
     if (isLabel) {
       const labelName = trimmedLine.slice(1, -1);
-      console.log('currentLineNumber', currentLineNumber);
       SYMBOL_TABLE.set(labelName, currentLineNumber);
       continue;
     }
 
-    if (isACommand) {
-      currentLineNumber += 1;
-    } else {
-      // CComaand일대
-      currentLineNumber += 1;
-    }
+    currentLineNumber += 1;
   }
 };
 
@@ -56,7 +49,6 @@ const printFileLineByLine = async (filePath) => {
   });
 
   let currentVariableValue = 16;
-  let outputData = '';
   const binaryLines = [];
 
   for await (const line of rl) {
@@ -79,38 +71,39 @@ const printFileLineByLine = async (filePath) => {
       continue;
     }
 
-    let binaryLine;
+    let binaryLine; // 16BitsBinary
+    const isCCommand = !isACommand;
 
-    if (isACommand) {
-      const aCommand = trimmedLine.slice(1);
-      const isACommandNumber = !isNaN(Number(aCommand));
+    if (isCCommand) {
+      binaryLine = changeCCommandTo16BitsBinary(trimmedLine);
+      binaryLines.push(binaryLine);
 
-      if (isACommandNumber) {
-        binaryLine = changeACommandTo16BitBinary(aCommand);
-        binaryLines.push(binaryLine);
+      continue;
+    }
 
-        continue;
-      }
+    const aCommand = trimmedLine.slice(1);
+    const isACommandNumber = !isNaN(Number(aCommand));
 
-      const hasSymbolInTable = SYMBOL_TABLE.has(aCommand);
+    if (isACommandNumber) {
+      binaryLine = changeACommandTo16BitsBinary(aCommand);
+      binaryLines.push(binaryLine);
 
-      if (hasSymbolInTable) {
-        // aCommand 기호가 있는지 기호테이블에서 조회
-        // 있으면 기호에 대응하는 숫자값으로 교체
-        const targetSymbol = aCommand;
-        const aCommandNumber = SYMBOL_TABLE.get(targetSymbol);
-        binaryLine = changeACommandTo16BitBinary(aCommandNumber);
-      } else {
-        // 테이블에 없다면 그 기호는 새로운 변수
-        // 새로운 변수 기호테이블에 담기
-        // 새로운 변수 숫자로 변환해서 처리하기.
-        const newSymbol = aCommand;
-        SYMBOL_TABLE.set(newSymbol, currentVariableValue);
-        binaryLine = changeACommandTo16BitBinary(currentVariableValue);
-        currentVariableValue += 1;
-      }
+      continue;
+    }
+
+    const hasSymbolInTable = SYMBOL_TABLE.has(aCommand);
+
+    if (hasSymbolInTable) {
+      const targetSymbol = aCommand;
+      const aCommandNumber = SYMBOL_TABLE.get(targetSymbol);
+
+      binaryLine = changeACommandTo16BitsBinary(aCommandNumber);
     } else {
-      binaryLine = changeCCommandTo16BitBinary(trimmedLine);
+      const newSymbol = aCommand;
+
+      SYMBOL_TABLE.set(newSymbol, currentVariableValue);
+      binaryLine = changeACommandTo16BitsBinary(currentVariableValue);
+      currentVariableValue += 1;
     }
 
     binaryLines.push(binaryLine);
@@ -121,7 +114,7 @@ const printFileLineByLine = async (filePath) => {
 
 const readAndProcessFiles = async (inputFilePath, outputFilePath) => {
   try {
-    await updateLabelLineByLine(inputFilePath);
+    await updateLabelToSymbolTableLineByLine(inputFilePath);
     const outputData = await printFileLineByLine(inputFilePath);
 
     fs.writeFile(outputFilePath, outputData, 'utf8', (err) => {

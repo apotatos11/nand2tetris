@@ -1,6 +1,6 @@
 const { getDestBinary, getCompBinary, getJumpBinary } = require('./code');
 
-const get16BitBinaryFromNumber = (number) => {
+const get16BitsBinaryFromNumber = (number) => {
   return number.toString(2).padStart(16, '0');
 };
 
@@ -54,15 +54,14 @@ const splitCompAndJump = (compAndJump) => {
   return { comp, jump };
 };
 
-const changeACommandTo16BitBinary = (aCommand) => {
+const changeACommandTo16BitsBinary = (aCommand) => {
   const aCommandNumber = Number(aCommand);
-  const sixTeenbitBinary = get16BitBinaryFromNumber(aCommandNumber);
+  const sixTeenbitBinary = get16BitsBinaryFromNumber(aCommandNumber);
 
   return sixTeenbitBinary;
 };
 
-const changeCCommandTo16BitBinary = (cCommand) => {
-  console.log('cCommand', cCommand);
+const changeCCommandTo16BitsBinary = (cCommand) => {
   const C_COMMAND_START = '111';
 
   const dest = getDest(cCommand);
@@ -73,18 +72,13 @@ const changeCCommandTo16BitBinary = (cCommand) => {
   const compBinary = getCompBinary(comp);
   const jumpBinary = getJumpBinary(jump);
 
-  console.log('dest', dest);
-  console.log('comp', comp);
-  console.log('jump', jump);
-
   const sixTeenbitBinary =
     C_COMMAND_START + compBinary + destBinary + jumpBinary;
-  console.log('result sixTeenbitBinary', sixTeenbitBinary);
 
   return sixTeenbitBinary;
 };
 
 module.exports = {
-  changeACommandTo16BitBinary,
-  changeCCommandTo16BitBinary,
+  changeACommandTo16BitsBinary,
+  changeCCommandTo16BitsBinary,
 };
