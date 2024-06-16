@@ -23,7 +23,7 @@ const COMP_TABLE_FOR_0 = new Map([
 
 const COMP_TABLE_FOR_1 = new Map([
   ['M', '1' + '110000'],
-  ['!M', '1' + '110011'],
+  ['!M', '1' + '110001'],
   ['-M', '1' + '110011'],
   ['M+1', '1' + '110111'],
   ['M-1', '1' + '110010'],
@@ -62,7 +62,7 @@ const JUMP_TABLE = new Map([
   ['JEQ', '010'],
   ['JGE', '011'],
   ['JLT', '100'],
-  ['JNE s', '101'],
+  ['JNE', '101'],
   ['JLE', '110'],
   ['JMP', '111'],
 ]);
@@ -89,7 +89,7 @@ const SYMBOL_TABLE = new Map([
   ['ARG', 2],
   ['THIS', 3],
   ['THAT', 4],
-  ['SCREEN', 0],
+  ['SCREEN', 16384],
   ['KBD', 24576],
 ]);
 

@@ -34,7 +34,9 @@ const updateLabelLineByLine = async (filePath) => {
 
     if (isLabel) {
       const labelName = trimmedLine.slice(1, -1);
-      SYMBOL_TABLE.set(labelName, currentLineNumber + 1);
+      console.log('currentLineNumber', currentLineNumber);
+      SYMBOL_TABLE.set(labelName, currentLineNumber);
+      continue;
     }
 
     if (isACommand) {
@@ -63,12 +65,17 @@ const printFileLineByLine = async (filePath) => {
     const isComment = trimmedLine.startsWith('//');
     const isWhiteSpace = trimmedLine.length === 0;
     const isACommand = trimmedLine.startsWith('@');
+    const isLabel = trimmedLine.startsWith('(');
 
     if (isComment) {
       continue;
     }
 
     if (isWhiteSpace) {
+      continue;
+    }
+
+    if (isLabel) {
       continue;
     }
 
