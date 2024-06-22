@@ -32,5 +32,50 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
+    Mux16(a=instruction , b=outputFromALU , sel=instruction[15] , out=outACInstCheck);
+
+    Not(in=instruction[15] , out=one );
+
+    Mux(a=one , b=instruction[5] , sel=instruction[15] , out=loadARegister);
+    ARegister(in=outACInstCheck , load=loadARegister , out=outARegister , out[0..14]=addressM);
+
+    Mux16(a=outARegister , b=inM , sel=instruction[12] , out=outForALU);
+    
+    Not(in=instruction[4] , out=not4);
+
+    And(a=instruction[4] , b=instruction[15] , out=loadDRegister ); // 제일 애먹은 코드......
+    DRegister(in=outputFromALU , load=loadDRegister , out=outDRegister);
+    
+    ALU(x=outDRegister , y=outForALU ,
+      zx=instruction[11] , nx=instruction[10] ,
+      zy=instruction[9] , ny=instruction[8] ,
+      f=instruction[7] , no=instruction[6] , 
+      out=outputFromALU , out=outM , zr=zr , ng=ng 
+    );
+
+    And(a=instruction[15] , b=instruction[3] , out=writeM);
+
+    Not(in=zr , out=notzr);
+    Not(in=ng , out=notng);
+
+    And(a=zr , b=notzr , out=null);
+    And(a=notzr , b=notng , out=jgt);
+    And(a=zr , b=notng , out=jeq);
+    And(a=notng , b=notng , out=jge);
+    And(a=notzr , b=ng , out=jlt);
+    And(a=notzr , b=notzr , out=jne);
+    Or(a=zr , b=ng , out=jle);
+    Or(a=zr , b=notzr , out=jmp);
+
+    Mux(a=null , b=jgt , sel=instruction[0] , out=muxA);
+    Mux(a=jeq , b=jge , sel=instruction[0] , out=muxB);
+    Mux(a=jlt , b=jne , sel=instruction[0] , out=muxC);
+    Mux(a=jle , b=jmp , sel=instruction[0] , out=muxD);
+    Mux(a=muxA , b=muxB , sel=instruction[1] , out=muxAB);
+    Mux(a=muxC , b=muxD , sel=instruction[1] , out=muxCD);
+    Mux(a=muxAB , b=muxCD , sel=instruction[2] , out=muxABCD);
+
+    Mux(a=null , b=muxABCD , sel=instruction[15] , out=loadPC);
+
+    PC(in=outARegister , load=loadPC , inc=jmp , reset=reset , out[0..14]=pc);
 }
