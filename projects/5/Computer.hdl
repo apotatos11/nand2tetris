@@ -21,5 +21,5 @@ CHIP Computer {
     ROM32K(address=outPC , out=instructionFromRom );
     Memory(in=outMFromCPU , load=writeMFromCPU , address=addressMFromCPU , out=outMemory );
     CPU(inM=outMemory , instruction=instructionFromRom ,
-     reset=reset , outM=outMFromCPU , writeM=writeMFromCPU , addressM=addressMFromCPU , pc=outPC );
+      reset=reset , outM=outMFromCPU , writeM=writeMFromCPU , addressM=addressMFromCPU , pc=outPC );
 }

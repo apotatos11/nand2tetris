@@ -19,7 +19,6 @@
  * their new values only in the next cycle.
  */
 CHIP CPU {
-
     IN  inM[16],         // M value input  (M = contents of RAM[A])
         instruction[16], // Instruction for execution
         reset;           // Signals whether to re-start the current
@@ -27,7 +26,7 @@ CHIP CPU {
                          // the current program (reset==0).
 
     OUT outM[16],        // M value output
-        writeM,          // Write to M? 
+        writeM,          // Write to M?
         addressM[15],    // Address in data memory (of M)
         pc[15];          // address of next instruction
 
@@ -40,17 +39,17 @@ CHIP CPU {
     ARegister(in=outACInstCheck , load=loadARegister , out=outARegister , out[0..14]=addressM);
 
     Mux16(a=outARegister , b=inM , sel=instruction[12] , out=outForALU);
-    
+
     Not(in=instruction[4] , out=not4);
 
     And(a=instruction[4] , b=instruction[15] , out=loadDRegister ); // 제일 애먹은 코드......
     DRegister(in=outputFromALU , load=loadDRegister , out=outDRegister);
-    
+
     ALU(x=outDRegister , y=outForALU ,
       zx=instruction[11] , nx=instruction[10] ,
       zy=instruction[9] , ny=instruction[8] ,
-      f=instruction[7] , no=instruction[6] , 
-      out=outputFromALU , out=outM , zr=zr , ng=ng 
+      f=instruction[7] , no=instruction[6] ,
+      out=outputFromALU , out=outM , zr=zr , ng=ng
     );
 
     And(a=instruction[15] , b=instruction[3] , out=writeM);
